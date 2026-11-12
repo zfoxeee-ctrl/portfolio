@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thumbnail Designer — YouTube Thumbnail Designer</title>
+  <meta name="description" content="Professional YouTube thumbnail designer. Eye-catching thumbnails that help creators stand out and get more clicks.">
+  <meta name="theme-color" content="#09090b">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Thumbnail Designer — YouTube Thumbnail Designer">
+  <meta property="og:description" content="Professional YouTube thumbnail designer. Eye-catching thumbnails that help creators stand out and get more clicks.">
+  <meta property="og:image" content="">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ttcwjmjnfyxzvfowhmj.supabase.co" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+:root{
+  --bg:#09090b; --bg2:#101014; --card:#15151a; --line:rgba(255,255,255,.08);
+  --text:#f5f5f7; --muted:#a1a1aa; --accent:#7c5cff;
+  --accent2:color-mix(in srgb,var(--accent) 60%,#22d3ee);
+  --radius:16px; --maxw:1200px; --hdr:68px;
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:var(--hdr)}
+body{background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.noscroll{overflow:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent2);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 20px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:#fff;padding:8px 14px;border-radius:8px;z-index:100}
+.skip:focus{left:8px}
+
+/* header */
+.site-header{position:fixed;inset:0 0 auto 0;height:var(--hdr);z-index:50;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+.site-header.scrolled{background:rgba(9,9,11,.8);backdrop-filter:blur(14px);border-color:var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:100%}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;letter-spacing:-.01em}
+.brand img{width:36px;height:36px;border-radius:10px;object-fit:cover}
+nav{display:flex;align-items:center;gap:6px}
+nav a{padding:8px 14px;border-radius:10px;color:var(--muted);font-weight:500;font-size:.95rem;transition:color .2s,background .2s}
+nav a:hover{color:var(--text);background:rgba(255,255,255,.05)}
+nav a.btn{color:#fff}
+.nav-toggle{display:none;width:42px;height:42px;border-radius:10px;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.nav-toggle span{width:20px;height:2px;background:var(--text);transition:.25s}
+@media(max-width:760px){
+  .nav-toggle{display:flex}
+  nav{position:fixed;top:var(--hdr);left:0;right:0;flex-direction:column;align-items:stretch;padding:14px 20px 20px;background:rgba(9,9,11,.97);border-bottom:1px solid var(--line);transform:translateY(-130%);transition:transform .3s;gap:4px}
+  nav.open{transform:none}
+  nav a{padding:12px 14px}
+}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 24px;border-radius:12px;font-weight:600;background:var(--accent);color:#fff;transition:transform .2s,box-shadow .2s,background .2s,border-color .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-sm{padding:8px 16px;font-size:.9rem}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 30px -8px var(--accent)}
+.btn-primary:hover{box-shadow:0 12px 36px -6px var(--accent)}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent);background:rgba(255,255,255,.04)}
+.btn-wa{background:#25d366;color:#052e14;margin:6px 0 18px}
+.btn-wa:hover{box-shadow:0 10px 30px -8px #25d366}
+
+/* hero */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:calc(var(--hdr) + 30px) 0 60px;overflow:hidden}
+.bg-fx{position:absolute;inset:0;pointer-events:none}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.45;animation:float 14s ease-in-out infinite}
+.o1{width:420px;height:420px;background:var(--accent);top:-80px;left:-100px}
+.o2{width:360px;height:360px;background:var(--accent2);bottom:-100px;right:-60px;animation-delay:-6s}
+.grid-fx{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse at center,#000 20%,transparent 70%)}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,30px)}}
+.hero-grid{position:relative;display:grid;gap:40px;align-items:center}
+.eyebrow{display:inline-block;font-size:.8rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);margin-bottom:14px}
+h1{font-size:clamp(2.3rem,7vw,4.4rem);line-height:1.05;letter-spacing:-.03em;font-weight:800;margin-bottom:20px;background:linear-gradient(180deg,#fff,#c9c9d3);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:clamp(1.8rem,4.5vw,2.8rem);letter-spacing:-.02em;line-height:1.15;margin-bottom:14px}
+.lead{color:var(--muted);font-size:1.08rem;max-width:58ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.hero-visual{display:flex;justify-content:center}
+.avatar{width:min(70vw,340px);aspect-ratio:1;border-radius:32px;padding:3px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 30px 80px -30px var(--accent);transform:rotate(3deg);animation:bob 6s ease-in-out infinite}
+.avatar img,.avatar-fallback{width:100%;height:100%;border-radius:29px;object-fit:cover;background:var(--card)}
+.avatar-fallback{display:grid;place-items:center;color:var(--muted)}
+@keyframes bob{0%,100%{transform:rotate(3deg) translateY(0)}50%{transform:rotate(3deg) translateY(-12px)}}
+@media(min-width:900px){.hero-grid{grid-template-columns:1.25fr .75fr}}
+
+/* sections */
+.section{padding:90px 0}
+.section.alt{background:var(--bg2);border-block:1px solid var(--line)}
+.section-head{margin-bottom:30px}
+
+/* filters */
+.filters{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 18px;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:9px 18px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-weight:500;font-size:.92rem;transition:.2s}
+.chip:hover{color:var(--text);border-color:rgba(255,255,255,.25)}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* gallery */
+.grid{display:grid;gap:22px;grid-template-columns:1fr}
+@media(min-width:620px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .3s,border-color .3s,box-shadow .3s;animation:rise .6s both;animation-delay:calc(var(--i)*60ms)}
+.card:hover{transform:translateY(-6px);border-color:color-mix(in srgb,var(--accent) 60%,transparent);box-shadow:0 24px 50px -24px var(--accent)}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.thumb{position:relative;display:block;width:100%;aspect-ratio:16/9;overflow:hidden;background:#0c0c0f}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.card:hover .thumb img{transform:scale(1.06)}
+.zoom{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);opacity:0;transition:opacity .3s;font-weight:600}
+.card:hover .zoom,.thumb:focus-visible .zoom{opacity:1}
+.badge{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:.75rem;font-weight:700;padding:4px 10px;border-radius:999px}
+.card-body{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px}
+.card-body h3{font-size:1rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{flex:none;font-size:.75rem;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--muted)}
+
+/* states */
+.state{grid-column:1/-1;text-align:center;padding:50px 20px;border:1px dashed var(--line);border-radius:var(--radius);color:var(--muted)}
+.state.error{border-color:rgba(255,90,90,.4);color:#ffb4b4}
+.state .btn{margin-top:14px}
+.skeleton{background:linear-gradient(90deg,var(--card) 25%,#1d1d24 50%,var(--card) 75%);background-size:200% 100%;animation:shine 1.4s infinite;border-radius:var(--radius)}
+.card-skel{aspect-ratio:16/10}
+@keyframes shine{to{background-position:-200% 0}}
+
+/* about */
+.about-grid{display:grid;gap:40px;align-items:center}
+@media(min-width:900px){.about-grid{grid-template-columns:.8fr 1.2fr}}
+.about-media img{width:100%;max-width:420px;aspect-ratio:6/7;object-fit:cover;border-radius:24px;border:1px solid var(--line);margin:auto}
+.about-block{margin-top:22px}
+.about-block h3{font-size:1rem;color:var(--accent2);margin-bottom:6px}
+.about-block p{color:var(--muted)}
+.socials{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.social{padding:8px 16px;border:1px solid var(--line);border-radius:999px;font-size:.9rem;color:var(--muted);transition:.2s}
+.social:hover{color:#fff;border-color:var(--accent);background:rgba(255,255,255,.04)}
+
+/* services */
+.services{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.service{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;transition:.3s}
+.service:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 60%,transparent)}
+.service h3{font-size:1.15rem;margin-bottom:10px}
+.service p{color:var(--muted);flex:1}
+.service-foot{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.price{font-weight:700;color:var(--accent2)}
+.link-arrow{color:var(--text);font-weight:600;font-size:.92rem}
+.link-arrow:hover{color:var(--accent2)}
+
+/* contact */
+.contact-grid{display:grid;gap:40px}
+@media(min-width:900px){.contact-grid{grid-template-columns:1fr 1fr}}
+.contact-line{color:var(--muted)}
+.contact-line a{color:var(--text);text-decoration:underline}
+.form{display:grid;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+.form label{display:grid;gap:6px;font-size:.9rem;font-weight:500;color:var(--muted)}
+.form input,.form textarea{background:#0c0c0f;border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--text);font:inherit;transition:border-color .2s}
+.form input:focus,.form textarea:focus{outline:none;border-color:var(--accent)}
+.hp{position:absolute!important;left:-9999px;opacity:0}
+.form-note{min-height:1.4em;font-size:.92rem}
+.form-note.ok{color:#6ee7a0}.form-note.err{color:#ff9b9b}
+
+/* footer */
+.site-footer{border-top:1px solid var(--line);padding:34px 0;color:var(--muted);font-size:.92rem}
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px}
+.foot .socials{margin:0}
+
+/* floating whatsapp */
+.wa-float{position:fixed;right:18px;bottom:18px;z-index:60;width:58px;height:58px;border-radius:50%;background:#25d366;color:#052e14;display:grid;place-items:center;box-shadow:0 10px 30px -6px rgba(37,211,102,.6);transition:transform .2s;animation:pulse 2.5s infinite}
+.wa-float:hover{transform:scale(1.1)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,.5)}70%{box-shadow:0 0 0 16px rgba(37,211,102,0)}100%{box-shadow:0 0 0 0 rgba(37,211,102,0)}}
+
+/* lightbox */
+.lightbox{position:fixed;inset:0;z-index:100;background:rgba(5,5,8,.94);backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.lb-stage{max-width:1100px;width:100%;max-height:100%;overflow:auto}
+.lb-stage img{width:100%;max-height:72vh;object-fit:contain;border-radius:12px;background:#000}
+.lb-info{padding:16px 4px;display:grid;gap:6px;justify-items:start}
+.lb-info p{color:var(--muted);max-width:70ch}
+.lb-close,.lb-prev,.lb-next{position:fixed;z-index:2;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.1);font-size:1.7rem;line-height:1;transition:background .2s}
+.lb-close:hover,.lb-prev:hover,.lb-next:hover{background:var(--accent)}
+.lb-close{top:16px;right:16px}
+.lb-prev{left:14px;top:50%;transform:translateY(-50%)}
+.lb-next{right:14px;top:50%;transform:translateY(-50%)}
+.lightbox.single .lb-prev,.lightbox.single .lb-next{display:none}
+
+/* toast */
+#toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;display:grid;gap:8px;width:min(92vw,420px)}
+.toast{padding:12px 16px;border-radius:12px;background:#1b1b22;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.5);transition:.3s}
+.toast.success{border-color:#2f9e61}.toast.error{border-color:#d9534f}.toast.out{opacity:0;transform:translateY(8px)}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+</style>
+</head>
+<body>
+  <a class="skip" href="#work">Skip to portfolio</a>
+
+  <header class="site-header">
+    <div class="wrap bar">
+      <a class="brand" href="#home" aria-label="Home">
+        <img id="brandLogo" alt="" hidden width="36" height="36">
+        <span id="brandName">Thumbnail Designer</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
+      <nav id="nav" aria-label="Main">
+        <a href="#work">Work</a>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+        <a href="#contact" class="btn btn-sm">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="bg-fx" aria-hidden="true"><i class="orb o1"></i><i class="orb o2"></i><i class="grid-fx"></i></div>
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">YouTube Thumbnail Designer</span>
+          <h1 id="heroTitle">I Create Thumbnails That Get Clicks.</h1>
+          <p id="heroDesc" class="lead">I design eye-catching, high-quality YouTube thumbnails that help content creators stand out, attract viewers, and present their videos professionally.</p>
+          <div class="cta">
+            <a href="#work" class="btn btn-primary">View My Work</a>
+            <a href="#contact" class="btn btn-ghost">Contact Me</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="avatar">
+            <img id="heroImg" alt="Portrait of the thumbnail designer" width="480" height="480" hidden>
+            <div id="heroFallback" class="avatar-fallback" aria-hidden="true">
+              <svg viewBox="0 0 100 100" width="55%" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><circle cx="50" cy="36" r="16"/><path d="M18 88c3-20 17-30 32-30s29 10 32 30"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="work" class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">Portfolio</span>
+          <h2>My Work</h2>
+        </div>
+        <div id="filters" class="filters" role="group" aria-label="Filter by category"></div>
+        <div id="grid" class="grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="about" class="section alt" hidden>
+      <div class="wrap about-grid">
+        <div class="about-media"><img id="aboutImg" alt="" hidden width="480" height="560" loading="lazy"></div>
+        <div>
+          <span class="eyebrow">About</span>
+          <h2 id="aboutName">About me</h2>
+          <p id="aboutPro" class="lead"></p>
+          <div id="aboutBlocks"></div>
+          <div id="aboutSocials" class="socials"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="section">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="eyebrow">Services</span>
+          <h2>What I Can Do For You</h2>
+        </div>
+        <div id="servicesGrid" class="services"><div class="skeleton card-skel"></div><div class="skeleton card-skel"></div><div class="skeleton card-skel"></div></div>
+      </div>
+    </section>
+
+    <section id="contact" class="section alt">
+      <div class="wrap contact-grid">
+        <div>
+          <span class="eyebrow">Contact</span>
+          <h2>Let's Make Your Next Thumbnail</h2>
+          <p class="lead">The fastest way to reach me is WhatsApp. Tell me about your channel and your video.</p>
+          <a data-wa="main" class="btn btn-wa" hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0 12 12 0 0 0 1.7 17.9L0 24l6.3-1.6A12 12 0 0 0 12 24a12 12 0 0 0 8.5-20.5zM12 22a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.3-.4A10 10 0 1 1 12 22zm5.5-7.5c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-1 1.2-.4.2-.7.1a8.2 8.2 0 0 1-4-3.5c-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.5l-.9-2.1c-.2-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.1 2.7 6.4 6.4 0 0 0 1.4 3.4 14.7 14.7 0 0 0 5.6 5c2.1.9 2.9 1 3.9.8a3.3 3.3 0 0 0 2.2-1.6 2.7 2.7 0 0 0 .2-1.6c-.1-.1-.3-.2-.6-.3z"/></svg>
+            Contact Me on WhatsApp
+          </a>
+          <p class="contact-line" hidden>Email: <a id="emailLink" href="#"></a></p>
+          <div id="contactSocials" class="socials"></div>
+        </div>
+        <form id="contactForm" class="form" novalidate>
+          <label>Name <input id="cf_name" name="name" maxlength="100" autocomplete="name" required></label>
+          <label>Email <input id="cf_email" name="email" type="email" maxlength="200" autocomplete="email" required></label>
+          <label>Message <textarea id="cf_message" name="message" rows="5" maxlength="5000" required></textarea></label>
+          <input id="cf_site" name="site" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button class="btn btn-primary" type="submit">Send message</button>
+          <p id="formNote" class="form-note" role="status"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap foot">
+      <p id="footerText">© <span id="year"></span> Thumbnail Designer. All rights reserved.</p>
+      <div id="footerSocials" class="socials"></div>
+    </div>
+  </footer>
+
+  <a data-wa="float" class="wa-float" aria-label="Chat on WhatsApp" hidden>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 12 0 12 12 0 0 0 1.7 17.9L0 24l6.3-1.6A12 12 0 0 0 12 24a12 12 0 0 0 8.5-20.5zM12 22a9.9 9.9 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.3-.4A10 10 0 1 1 12 22zm5.5-7.5c-.3-.1-1.8-.9-2-1s-.5-.1-.7.1-.8 1-1 1.2-.4.2-.7.1a8.2 8.2 0 0 1-4-3.5c-.3-.5.3-.5.9-1.6.1-.2 0-.4 0-.5l-.9-2.1c-.2-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.7 3.7 0 0 0-1.1 2.7 6.4 6.4 0 0 0 1.4 3.4 14.7 14.7 0 0 0 5.6 5c2.1.9 2.9 1 3.9.8a3.3 3.3 0 0 0 2.2-1.6 2.7 2.7 0 0 0 .2-1.6c-.1-.1-.3-.2-.6-.3z"/></svg>
+  </a>
+
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Project preview" hidden>
+    <button class="lb-close" aria-label="Close">×</button>
+    <button class="lb-prev" aria-label="Previous">‹</button>
+    <button class="lb-next" aria-label="Next">›</button>
+    <div class="lb-stage">
+      <img id="lbImg" alt="">
+      <div class="lb-info"><h3 id="lbTitle"></h3><span id="lbCat" class="tag"></span><p id="lbDesc"></p></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+// Supabase configuration (public values only — the publishable key is safe in the browser
+// because every table is protected by Row Level Security. NEVER put a secret/service_role key here.)
+const SUPABASE_URL = "https://ttcwjmjnfyxzvfowhmj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Esvf9SZsqq9cB580Zx7ZmA_-ul7QH0V";
+
+const supabaseClient = window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
+
+</script>
+  <script>
+// Small shared helpers (public site + admin)
+const U = (() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // only http(s) links are ever rendered as href/src
+  const safeUrl = (u) => {
+    try { const x = new URL(String(u || '').trim()); return /^https?:$/.test(x.protocol) ? x.href : ''; }
+    catch { return ''; }
+  };
+  const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+  const slugify = (s) => String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item';
+  const fmtDate = (d) => new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+  function toast(msg, type = 'success') {
+    let box = $('#toasts');
+    if (!box) { box = document.createElement('div'); box.id = 'toasts'; box.setAttribute('aria-live', 'polite'); document.body.appendChild(box); }
+    const t = document.createElement('div');
+    t.className = 'toast ' + type; t.textContent = msg;
+    box.appendChild(t);
+    setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, type === 'error' ? 6000 : 3500);
+  }
+  function errMsg(e) {
+    const m = (e && (e.message || e.error_description)) || String(e || 'Unknown error');
+    if (/failed to fetch|networkerror|load failed/i.test(m)) return 'Cannot reach Supabase. Check your connection and the project URL in supabase-config.js.';
+    return m;
+  }
+  return { $, $$, esc, safeUrl, debounce, slugify, fmtDate, toast, errMsg };
+})();
+
+</script>
+  <script>
+// Portfolio gallery: loads published projects + categories from Supabase, filters, lightbox
+const Portfolio = (() => {
+  const { $, $$, esc, safeUrl, errMsg } = U;
+  let projects = [], categories = [], active = 'all', shown = [], current = -1, lastFocus = null;
+
+  async function load() {
+    const grid = $('#grid'), filters = $('#filters');
+    if (!supabaseClient) { grid.innerHTML = errorBox('Supabase library failed to load.'); return; }
+    if (!projects.length) grid.innerHTML = Array.from({ length: 6 }, () => '<div class="skeleton card-skel"></div>').join('');
+    const [p, c] = await Promise.all([
+      supabaseClient.from('projects')
+        .select('id,title,description,image_url,is_featured,display_order,category_id')
+        .eq('is_published', true)
+        .order('display_order', { ascending: true })
+        .order('created_at', { ascending: false }),
+      supabaseClient.from('categories').select('id,name,slug').order('name')
+    ]).catch((e) => [{ error: e }, { error: e }]);
+    if (p.error || c.error) {
+      grid.innerHTML = errorBox(errMsg(p.error || c.error));
+      const b = $('#retryWork'); if (b) b.onclick = load;
+      return;
+    }
+    projects = p.data; categories = c.data;
+    const byId = Object.fromEntries(categories.map((x) => [x.id, x]));
+    projects.forEach((x) => { x.category = byId[x.category_id] || null; });
+    // keep the active filter only if it still exists
+    const used = new Set(projects.map((x) => x.category && x.category.slug).filter(Boolean));
+    if (active !== 'all' && !used.has(active)) active = 'all';
+    renderFilters(categories.filter((x) => used.has(x.slug)));
+    renderGrid();
+  }
+
+  function errorBox(msg) {
+    return `<div class="state error" role="alert"><p>${esc(msg)}</p><button class="btn btn-ghost" id="retryWork">Try again</button></div>`;
+  }
+
+  function renderFilters(cats) {
+    const f = $('#filters');
+    if (!cats.length) { f.innerHTML = ''; return; }
+    f.innerHTML = [{ slug: 'all', name: 'All' }, ...cats].map((c) =>
+      `<button class="chip${c.slug === active ? ' active' : ''}" data-slug="${esc(c.slug)}" aria-pressed="${c.slug === active}">${esc(c.name)}</button>`).join('');
+    $$('.chip', f).forEach((b) => b.addEventListener('click', () => { active = b.dataset.slug; renderFilters(cats); renderGrid(); }));
+  }
+
+  function renderGrid() {
+    const grid = $('#grid');
+    shown = projects.filter((x) => active === 'all' || (x.category && x.category.slug === active));
+    if (!shown.length) {
+      grid.innerHTML = `<div class="state"><p>${projects.length ? 'No projects in this category yet.' : 'New work is coming soon.'}</p></div>`;
+      return;
+    }
+    grid.innerHTML = shown.map((x, i) => {
+      const src = safeUrl(x.image_url);
+      return `<article class="card" style="--i:${Math.min(i, 8)}">
+        <button class="thumb" data-i="${i}" aria-label="View ${esc(x.title)}">
+          <img src="${esc(src)}" alt="${esc(x.title)} — YouTube thumbnail${x.category ? ' (' + esc(x.category.name) + ')' : ''}" width="1280" height="720" loading="${i < 3 ? 'eager' : 'lazy'}" decoding="async">
+          ${x.is_featured ? '<span class="badge">★ Featured</span>' : ''}
+          <span class="zoom" aria-hidden="true">View</span>
+        </button>
+        <div class="card-body">
+          <h3>${esc(x.title)}</h3>
+          ${x.category ? `<span class="tag">${esc(x.category.name)}</span>` : ''}
+        </div>
+      </article>`;
+    }).join('');
+    $$('.thumb', grid).forEach((b) => b.addEventListener('click', () => openLightbox(+b.dataset.i)));
+  }
+
+  // ---- lightbox ----
+  function openLightbox(i) {
+    const lb = $('#lightbox'); current = i; lastFocus = document.activeElement;
+    paint(); lb.hidden = false; document.body.classList.add('noscroll');
+    $('.lb-close', lb).focus();
+  }
+  function paint() {
+    const x = shown[current]; if (!x) return;
+    $('#lbImg').src = safeUrl(x.image_url); $('#lbImg').alt = x.title;
+    $('#lbTitle').textContent = x.title;
+    $('#lbCat').textContent = x.category ? x.category.name : '';
+    $('#lbDesc').textContent = x.description || '';
+    $('#lightbox').classList.toggle('single', shown.length < 2);
+  }
+  function closeLightbox() {
+    $('#lightbox').hidden = true; document.body.classList.remove('noscroll');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  function step(d) { if (shown.length > 1) { current = (current + d + shown.length) % shown.length; paint(); } }
+
+  function init() {
+    const lb = $('#lightbox');
+    $('.lb-close', lb).addEventListener('click', closeLightbox);
+    $('.lb-prev', lb).addEventListener('click', () => step(-1));
+    $('.lb-next', lb).addEventListener('click', () => step(1));
+    lb.addEventListener('click', (e) => { if (e.target === lb || e.target.classList.contains('lb-stage')) closeLightbox(); });
+    document.addEventListener('keydown', (e) => {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowLeft') step(-1);
+      else if (e.key === 'ArrowRight') step(1);
+    });
+    let sx = null;
+    lb.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', (e) => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1); sx = null; });
+  }
+  return { init, load };
+})();
+
+</script>
+  <script>
+// Public site: settings, about, services, contact form, realtime sync
+(() => {
+  const { $, $$, esc, safeUrl, debounce, toast, errMsg } = U;
+  const SOCIALS = { instagram: 'Instagram', youtube: 'YouTube', twitter: 'X / Twitter', tiktok: 'TikTok', behance: 'Behance', discord: 'Discord' };
+  let waNumber = '';
+
+  const setText = (sel, v) => { const el = $(sel); if (el && v) el.textContent = v; };
+  const socialLinks = (obj) => Object.entries(SOCIALS)
+    .map(([k, label]) => { const u = safeUrl((obj || {})[k]); return u ? `<a class="social" href="${esc(u)}" target="_blank" rel="noopener noreferrer">${label}</a>` : ''; })
+    .join('');
+
+  function waLink(text) {
+    return `https://wa.me/${waNumber}` + (text ? `?text=${encodeURIComponent(text)}` : '');
+  }
+
+  async function loadSettings() {
+    const { data, error } = await supabaseClient.from('website_settings').select('setting_key,setting_value');
+    if (error) throw error;
+    const s = {}; data.forEach((r) => { s[r.setting_key] = r.setting_value; });
+
+    const title = s.site_title || 'Thumbnail Designer';
+    document.title = `${title} — YouTube Thumbnail Designer`;
+    const desc = s.meta_description || '';
+    if (desc) { $('meta[name="description"]').content = desc; $('meta[property="og:description"]').content = desc; }
+    $('meta[property="og:title"]').content = document.title;
+    const hero = safeUrl(s.hero_image);
+    if (hero) $('meta[property="og:image"]').content = hero;
+
+    if (/^#[0-9a-f]{6}$/i.test(s.accent_color || '')) {
+      document.documentElement.style.setProperty('--accent', s.accent_color);
+      $('meta[name="theme-color"]').content = '#09090b';
+    }
+
+    // logo / brand
+    const logo = safeUrl(s.logo_url);
+    $('#brandName').textContent = title;
+    const li = $('#brandLogo'); if (logo) { li.src = logo; li.hidden = false; } else li.hidden = true;
+
+    setText('#heroTitle', s.hero_headline);
+    setText('#heroDesc', s.hero_description);
+    const hi = $('#heroImg'), hf = $('#heroFallback');
+    if (hero) { hi.src = hero; hi.hidden = false; hf.hidden = true; } else { hi.hidden = true; hf.hidden = false; }
+    $('#footerText').textContent = s.footer_text || `© ${new Date().getFullYear()} ${title}`;
+
+    // contact
+    waNumber = String(s.whatsapp_number || '').replace(/\D/g, '');
+    const hasWa = waNumber.length >= 6;
+    $$('[data-wa]').forEach((a) => {
+      a.hidden = !hasWa;
+      if (hasWa) { a.href = waLink(a.dataset.wa === 'float' ? '' : "Hi! I'd like a YouTube thumbnail."); a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    });
+    const mail = String(s.email || '').trim();
+    const me = $('#emailLink');
+    if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) { me.href = 'mailto:' + mail; me.textContent = mail; me.parentElement.hidden = false; } else me.parentElement.hidden = true;
+    $('#contactSocials').innerHTML = socialLinks(s.social_links);
+    $('#footerSocials').innerHTML = socialLinks(s.social_links);
+  }
+
+  async function loadAbout() {
+    const { data, error } = await supabaseClient.from('about').select('*').limit(1).maybeSingle();
+    if (error) throw error;
+    const sec = $('#about');
+    if (!data) { sec.hidden = true; return; }
+    sec.hidden = false;
+    $('#aboutName').textContent = data.name || 'About me';
+    $('#aboutPro').textContent = data.professional_description || '';
+    const img = safeUrl(data.profile_image), ai = $('#aboutImg');
+    if (img) { ai.src = img; ai.alt = `${data.name || 'Designer'} — profile photo`; ai.hidden = false; } else ai.hidden = true;
+    const blocks = [['Biography', data.biography], ['Experience', data.experience], ['Design approach', data.design_approach]]
+      .filter(([, t]) => t && t.trim())
+      .map(([h, t]) => `<div class="about-block"><h3>${h}</h3><p>${esc(t).replace(/\n/g, '<br>')}</p></div>`).join('');
+    $('#aboutBlocks').innerHTML = blocks;
+    $('#aboutSocials').innerHTML = socialLinks(data.social_links);
+  }
+
+  async function loadServices() {
+    const box = $('#servicesGrid');
+    const { data, error } = await supabaseClient.from('services').select('*').eq('is_visible', true).order('display_order');
+    if (error) throw error;
+    if (!data.length) { box.innerHTML = '<div class="state"><p>Services will be listed here soon.</p></div>'; return; }
+    box.innerHTML = data.map((s) => `
+      <article class="service">
+        <h3>${esc(s.title)}</h3>
+        <p>${esc(s.description)}</p>
+        <div class="service-foot">
+          ${s.price ? `<span class="price">${esc(s.price)}</span>` : '<span></span>'}
+          <a class="link-arrow" href="#contact">Order →</a>
+        </div>
+      </article>`).join('');
+  }
+
+  const safe = async (fn, sel, label) => {
+    try { await fn(); }
+    catch (e) { const el = $(sel); if (el) el.innerHTML = `<div class="state error" role="alert"><p>${esc(label)}: ${esc(errMsg(e))}</p></div>`; console.error(label, e); }
+  };
+
+  async function loadAll() {
+    if (!supabaseClient) { toast('Supabase library failed to load.', 'error'); return; }
+    await Promise.all([
+      safe(loadSettings, '#heroDesc', 'Could not load settings'),
+      safe(loadAbout, '#aboutBlocks', 'Could not load About'),
+      safe(loadServices, '#servicesGrid', 'Could not load services'),
+      Portfolio.load()
+    ]);
+  }
+
+  function setupContactForm() {
+    const form = $('#contactForm'), btn = $('button[type=submit]', form), note = $('#formNote');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      note.className = 'form-note'; note.textContent = '';
+      if ($('#cf_site', form).value) return; // honeypot
+      const name = $('#cf_name').value.trim(), email = $('#cf_email').value.trim(), message = $('#cf_message').value.trim();
+      if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !message) {
+        note.className = 'form-note err'; note.textContent = 'Please enter your name, a valid email and a message.'; return;
+      }
+      btn.disabled = true; btn.textContent = 'Sending…';
+      try {
+        const { error } = await supabaseClient.from('messages').insert({ name, email, message });
+        if (error) throw error;
+        form.reset(); note.className = 'form-note ok'; note.textContent = 'Thanks! Your message was sent. I will reply soon.';
+      } catch (err) {
+        note.className = 'form-note err'; note.textContent = 'Message not sent: ' + errMsg(err);
+      } finally { btn.disabled = false; btn.textContent = 'Send message'; }
+    });
+  }
+
+  function setupNav() {
+    const t = $('#navToggle'), nav = $('#nav');
+    t.addEventListener('click', () => { const o = nav.classList.toggle('open'); t.setAttribute('aria-expanded', o); });
+    $$('a', nav).forEach((a) => a.addEventListener('click', () => { nav.classList.remove('open'); t.setAttribute('aria-expanded', false); }));
+    const hdr = $('.site-header');
+    const onScroll = () => hdr.classList.toggle('scrolled', window.scrollY > 10);
+    onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  function setupRealtime() {
+    if (!supabaseClient || !supabaseClient.channel) return;
+    const refresh = debounce(loadAll, 500);
+    try {
+      let ch = supabaseClient.channel('public-site');
+      ['projects', 'categories', 'services', 'about', 'website_settings'].forEach((t) =>
+        { ch = ch.on('postgres_changes', { event: '*', schema: 'public', table: t }, refresh); });
+      ch.subscribe();
+    } catch (e) { console.warn('Realtime unavailable', e); }
+    // fallback: refresh when the tab becomes visible again
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    Portfolio.init(); setupNav(); setupContactForm();
+    $('#year') && ($('#year').textContent = new Date().getFullYear());
+    loadAll(); setupRealtime();
+  });
+})();
+
+</script>
+</body>
+</html>
