@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+:root{--bg:#0b0b0e;--panel:#131318;--panel2:#1a1a21;--line:rgba(255,255,255,.08);--text:#f2f2f5;--muted:#9a9aa6;--accent:#7c5cff;--danger:#e5484d;--ok:#2fb677;--side:250px;font-family:'Inter',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+img{max-width:100%;display:block}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);font-weight:500;font-size:.92rem;transition:.2s}
+.btn:hover{border-color:rgba(255,255,255,.25)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 11px;font-size:.82rem}
+.icon-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);font-size:1.2rem}
+
+/* gate / login */
+.gate{min-height:100vh;display:grid;place-content:center;justify-items:center;gap:14px;text-align:center;padding:20px}
+.spinner{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--accent);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.login-body{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login-card{width:min(100%,380px);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:30px;display:grid;gap:14px}
+.login-card form{display:grid;gap:14px}
+.msg{color:#ff9b9b;min-height:1.3em;font-size:.9rem}
+
+/* layout */
+.app{display:grid;grid-template-columns:var(--side) 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:20px 14px}
+.side-brand{font-weight:700;font-size:1.1rem;padding:6px 12px 18px}
+#sideNav{display:grid;gap:4px;flex:1;align-content:start}
+#sideNav a{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;color:var(--muted);font-weight:500;font-size:.95rem}
+#sideNav a:hover{background:rgba(255,255,255,.04);color:var(--text)}
+#sideNav a.active{background:color-mix(in srgb,var(--accent) 22%,transparent);color:#fff}
+.side-foot{display:grid;gap:10px;padding:10px 4px 0;font-size:.9rem}
+.pill{background:var(--accent);color:#fff;font-size:.72rem;padding:1px 8px;border-radius:999px}
+.content{min-width:0}
+.topbar{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,11,14,.9);backdrop-filter:blur(10px);z-index:5}
+.topbar h1{font-size:1.3rem}
+.topbar .icon-btn{display:none}
+#main{padding:24px;max-width:1100px}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:19}
+@media(max-width:860px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;z-index:20;width:var(--side);transform:translateX(-100%);transition:transform .25s}
+  .sidebar.open{transform:none}
+  .topbar .icon-btn{display:block}
+  #main{padding:16px}
+}
+
+/* ui parts */
+.cards{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:26px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.stat b{display:block;font-size:1.9rem;line-height:1.1}
+.stat span{color:var(--muted);font-size:.85rem}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px}
+.panel h2{font-size:1.05rem;margin-bottom:14px}
+.toolbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.list{display:grid;gap:10px}
+.row{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.row .grow{flex:1;min-width:0}
+.row .grow b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .grow small{color:var(--muted)}
+.row img.t{width:112px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;background:#000;flex:none}
+.actions{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+@media(max-width:620px){.row{flex-wrap:wrap}.row img.t{width:100%}.actions{width:100%;justify-content:flex-start}}
+.badge{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--muted);margin-right:4px}
+.badge.ok{background:rgba(47,182,119,.18);color:#6ee7a0}
+.badge.feat{background:rgba(124,92,255,.22);color:#c4b5ff}
+.empty{text-align:center;padding:40px 16px;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}
+.err-box{border:1px solid rgba(229,72,77,.5);background:rgba(229,72,77,.08);border-radius:12px;padding:16px;display:grid;gap:10px;justify-items:start}
+
+/* forms */
+.form{display:grid;gap:14px}
+.form .two{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+@media(max-width:620px){.form .two{grid-template-columns:1fr}}
+label{display:grid;gap:6px;font-size:.85rem;font-weight:500;color:var(--muted)}
+label.check{display:flex;align-items:center;gap:10px;color:var(--text)}
+input,textarea,select{width:100%;background:#0c0c10;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font:inherit}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+input[type=color]{height:42px;padding:4px}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+textarea{resize:vertical;min-height:90px}
+.preview{width:100%;max-width:360px;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:#000;border:1px solid var(--line)}
+.preview.sq{aspect-ratio:1;max-width:160px}
+.progress{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+.hint{font-size:.8rem;color:var(--muted)}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:grid;place-items:center;padding:16px;overflow:auto}
+.dialog{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;width:min(100%,560px);max-height:92vh;overflow:auto;display:grid;gap:16px}
+.dialog.wide{width:min(100%,640px)}
+.dialog h3{font-size:1.15rem}
+.row.end,.end{justify-content:flex-end;display:flex;gap:10px}
+details.msg-item{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+details.msg-item.unread{border-color:var(--accent)}
+details.msg-item summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;list-style:none}
+details.msg-item p{margin:12px 0;white-space:pre-wrap;word-break:break-word}
+
+#toasts{position:fixed;right:16px;bottom:16px;z-index:200;display:grid;gap:8px;width:min(92vw,380px)}
+.toast{padding:12px 16px;border-radius:12px;background:#1b1b22;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.5);transition:.3s}
+.toast.success{border-color:var(--ok)}.toast.error{border-color:var(--danger)}.toast.out{opacity:0;transform:translateY(8px)}
+
+</style>
+</head>
+<body>
+  <div id="gate" class="gate"><div class="spinner"></div><p class="muted">Checking access…</p></div>
+
+  <div id="app" class="app" hidden>
+    <aside id="sidebar" class="sidebar">
+      <div class="side-brand">Dashboard</div>
+      <nav id="sideNav">
+        <a href="#overview" data-s="overview">Overview</a>
+        <a href="#portfolio" data-s="portfolio">Manage Portfolio</a>
+        <a href="#categories" data-s="categories">Manage Categories</a>
+        <a href="#services" data-s="services">Manage Services</a>
+        <a href="#about" data-s="about">About Me</a>
+        <a href="#messages" data-s="messages">Messages <span id="unread" class="pill" hidden></span></a>
+        <a href="#settings" data-s="settings">Website Settings</a>
+      </nav>
+      <div class="side-foot">
+        <a class="muted" href="./" target="_blank" rel="noopener">View site ↗</a>
+        <button id="logout" class="btn ghost">Logout</button>
+      </div>
+    </aside>
+    <div id="scrim" class="scrim" hidden></div>
+
+    <div class="content">
+      <header class="topbar">
+        <button id="menuBtn" class="icon-btn" aria-label="Menu">☰</button>
+        <h1 id="pageTitle">Overview</h1>
+      </header>
+      <main id="main"></main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+// Supabase configuration (public values only — the publishable key is safe in the browser
+// because every table is protected by Row Level Security. NEVER put a secret/service_role key here.)
+const SUPABASE_URL = "https://ttcwjmjnfyxzvfowhmj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Esvf9SZsqq9cB580Zx7ZmA_-ul7QH0V";
+
+const supabaseClient = window.supabase
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
+
+</script>
+  <script>
+// Small shared helpers (public site + admin)
+const U = (() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // only http(s) links are ever rendered as href/src
+  const safeUrl = (u) => {
+    try { const x = new URL(String(u || '').trim()); return /^https?:$/.test(x.protocol) ? x.href : ''; }
+    catch { return ''; }
+  };
+  const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+  const slugify = (s) => String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item';
+  const fmtDate = (d) => new Date(d).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+  function toast(msg, type = 'success') {
+    let box = $('#toasts');
+    if (!box) { box = document.createElement('div'); box.id = 'toasts'; box.setAttribute('aria-live', 'polite'); document.body.appendChild(box); }
+    const t = document.createElement('div');
+    t.className = 'toast ' + type; t.textContent = msg;
+    box.appendChild(t);
+    setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 300); }, type === 'error' ? 6000 : 3500);
+  }
+  function errMsg(e) {
+    const m = (e && (e.message || e.error_description)) || String(e || 'Unknown error');
+    if (/failed to fetch|networkerror|load failed/i.test(m)) return 'Cannot reach Supabase. Check your connection and the project URL in supabase-config.js.';
+    return m;
+  }
+  return { $, $$, esc, safeUrl, debounce, slugify, fmtDate, toast, errMsg };
+})();
+
+</script>
+  <script>
+(() => {
+  'use strict';
+  const { $, $$, esc, safeUrl, slugify, fmtDate, toast, errMsg } = U;
+  const sb = supabaseClient;
+  const BASE = location.pathname.replace(/\/admin(\/.*)?$/, '');
+  const LOGIN_URL = 'login.html';
+  const BUCKET = 'portfolio-images';
+  const main = $('#main');
+  const TITLES = { overview: 'Overview', portfolio: 'Manage Portfolio', categories: 'Manage Categories', services: 'Manage Services', about: 'About Me', messages: 'Messages', settings: 'Website Settings' };
+  const SOCIALS = { instagram: 'Instagram', youtube: 'YouTube', twitter: 'X / Twitter', tiktok: 'TikTok', behance: 'Behance', discord: 'Discord' };
+
+  /* ---------------- helpers ---------------- */
+  const loading = () => '<div class="gate" style="min-height:240px"><div class="spinner"></div></div>';
+  const errBox = (e, retry) => {
+    main.innerHTML = `<div class="err-box" role="alert"><b>Something went wrong</b><span>${esc(errMsg(e))}</span><button class="btn" id="retry">Try again</button></div>`;
+    $('#retry').onclick = retry;
+  };
+  // Throws if Supabase returned an error OR if RLS silently affected 0 rows.
+  const must = ({ data, error }, needRows = false) => {
+    if (error) throw error;
+    if (needRows && (!data || (Array.isArray(data) && !data.length))) throw new Error('Not allowed or item no longer exists.');
+    return data;
+  };
+  const confirmDialog = (message, okText = 'Delete') => new Promise((res) => {
+    const o = document.createElement('div'); o.className = 'overlay';
+    o.innerHTML = `<div class="dialog" role="alertdialog" aria-modal="true"><p>${esc(message)}</p><div class="end"><button class="btn" data-x="0">Cancel</button><button class="btn danger" data-x="1">${esc(okText)}</button></div></div>`;
+    o.addEventListener('click', (e) => { const b = e.target.closest('[data-x]'); if (b || e.target === o) { o.remove(); res(b ? b.dataset.x === '1' : false); } });
+    document.body.appendChild(o); $('[data-x="0"]', o).focus();
+  });
+  function modal(title, body, wide) {
+    const o = document.createElement('div'); o.className = 'overlay';
+    o.innerHTML = `<div class="dialog${wide ? ' wide' : ''}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><h3>${esc(title)}</h3>${body}</div>`;
+    const close = () => o.remove();
+    o.addEventListener('mousedown', (e) => { if (e.target === o) close(); });
+    document.addEventListener('keydown', function k(e) { if (!o.isConnected) return document.removeEventListener('keydown', k); if (e.key === 'Escape') close(); });
+    document.body.appendChild(o);
+    return { el: o, close };
+  }
+  const guard = async (btn, fn) => {
+    const t = btn && btn.textContent; if (btn) { btn.disabled = true; }
+    try { return await fn(); } catch (e) { console.error(e); toast(errMsg(e), 'error'); }
+    finally { if (btn) { btn.disabled = false; btn.textContent = t; } }
+  };
+
+  /* ---------------- images ---------------- */
+  const ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
+  const MAX_INPUT = 15 * 1024 * 1024;  // before optimization
+  const MAX_OUTPUT = 5 * 1024 * 1024;  // bucket limit
+  async function optimize(file, maxW) {
+    if (!ALLOWED.includes(file.type)) throw new Error('Only JPEG, PNG or WebP images are allowed.');
+    if (file.size > MAX_INPUT) throw new Error('Image is too large (max 15 MB).');
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, maxW / bmp.width);
+    const c = document.createElement('canvas');
+    c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const toBlob = (t, q) => new Promise((r) => c.toBlob(r, t, q));
+    let blob = await toBlob('image/webp', 0.88);
+    if (!blob || blob.type !== 'image/webp') blob = await toBlob('image/jpeg', 0.9);
+    if (!blob) throw new Error('Could not process the image.');
+    if (blob.size > MAX_OUTPUT) { blob = await toBlob('image/webp', 0.7) || blob; }
+    if (blob.size > MAX_OUTPUT) throw new Error('Image is still over 5 MB after optimization.');
+    return blob;
+  }
+  async function uploadImage(file, folder, maxW, onProgress) {
+    const blob = await optimize(file, maxW);
+    const ext = blob.type === 'image/webp' ? 'webp' : 'jpg';
+    const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) throw new Error('Session expired. Please sign in again.');
+    await new Promise((resolve, reject) => {
+      const x = new XMLHttpRequest();
+      x.open('POST', `${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`);
+      x.setRequestHeader('Authorization', 'Bearer ' + session.access_token);
+      x.setRequestHeader('apikey', SUPABASE_KEY);
+      x.setRequestHeader('Content-Type', blob.type);
+      x.setRequestHeader('cache-control', 'max-age=31536000');
+      x.upload.onprogress = (e) => e.lengthComputable && onProgress && onProgress(e.loaded / e.total);
+      x.onload = () => {
+        if (x.status < 300) return resolve();
+        let m = 'Upload failed (' + x.status + ').'; try { m = JSON.parse(x.responseText).message || m; } catch { /* ignore */ }
+        reject(new Error(m));
+      };
+      x.onerror = () => reject(new Error('Network error during upload.'));
+      x.send(blob);
+    });
+    return { path, url: sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl };
+  }
+  async function removeByUrl(url) {
+    if (!url) return;
+    const marker = `/${BUCKET}/`; const i = url.indexOf(marker);
+    if (i < 0) return;
+    const path = decodeURIComponent(url.slice(i + marker.length).split('?')[0]);
+    const { error } = await sb.storage.from(BUCKET).remove([path]);
+    if (error) console.warn('Could not delete old image', error);
+  }
+  // wires <input type=file> + preview
+  function imagePicker(root, imgSel, fileSel) {
+    const f = $(fileSel, root), img = $(imgSel, root);
+    f.addEventListener('change', () => {
+      const file = f.files[0]; if (!file) return;
+      if (!ALLOWED.includes(file.type)) { toast('Only JPEG, PNG or WebP images are allowed.', 'error'); f.value = ''; return; }
+      img.src = URL.createObjectURL(file); img.hidden = false;
+    });
+  }
+  const progressBar = (root) => { const bar = $('.progress', root), i = $('i', bar); return (p) => { bar.hidden = false; i.style.width = Math.round(p * 100) + '%'; }; };
+
+  /* ---------------- ordering ---------------- */
+  async function move(table, list, idx, dir) {
+    const j = idx + dir; if (j < 0 || j >= list.length) return;
+    const arr = list.slice(); [arr[idx], arr[j]] = [arr[j], arr[idx]];
+    const changes = arr.map((it, n) => ({ it, n })).filter(({ it, n }) => it.display_order !== n);
+    await Promise.all(changes.map(({ it, n }) => sb.from(table).update({ display_order: n }).eq('id', it.id).select('id').then((r) => must(r, true))));
+  }
+
+  /* ---------------- OVERVIEW ---------------- */
+  async function overview() {
+    main.innerHTML = loading();
+    try {
+      const cnt = (t, f) => { let q = sb.from(t).select('id', { count: 'exact', head: true }); if (f) q = f(q); return q.then((r) => { if (r.error) throw r.error; return r.count || 0; }); };
+      const [total, pub, cats, svcs, msgs, unread, recent] = await Promise.all([
+        cnt('projects'), cnt('projects', (q) => q.eq('is_published', true)), cnt('categories'), cnt('services'), cnt('messages'),
+        cnt('messages', (q) => q.eq('is_read', false)),
+        sb.from('projects').select('id,title,image_url,is_published,created_at').order('created_at', { ascending: false }).limit(5).then(must)
+      ]);
+      main.innerHTML = `
+        <div class="cards">
+          <div class="stat"><b>${total}</b><span>Portfolio projects</span></div>
+          <div class="stat"><b>${pub}</b><span>Published</span></div>
+          <div class="stat"><b>${cats}</b><span>Categories</span></div>
+          <div class="stat"><b>${svcs}</b><span>Services</span></div>
+          <div class="stat"><b>${msgs}</b><span>Messages (${unread} unread)</span></div>
+        </div>
+        <div class="panel"><h2>Recently added projects</h2>
+          ${recent.length ? `<div class="list">${recent.map((p) => `<div class="row"><img class="t" src="${esc(safeUrl(p.image_url))}" alt="" loading="lazy"><div class="grow"><b>${esc(p.title)}</b><small>${fmtDate(p.created_at)}</small></div><span class="badge ${p.is_published ? 'ok' : ''}">${p.is_published ? 'Published' : 'Draft'}</span></div>`).join('')}</div>` : '<div class="empty">No projects yet. <a href="#portfolio" class="muted"><u>Add your first one</u></a>.</div>'}
+        </div>`;
+    } catch (e) { errBox(e, overview); }
+  }
+
+  /* ---------------- PORTFOLIO ---------------- */
+  let projects = [];
+  async function portfolio() {
+    main.innerHTML = loading();
+    try {
+      const [p, c] = await Promise.all([
+        sb.from('projects').select('*, categories(name)').order('display_order').order('created_at', { ascending: false }).then(must),
+        sb.from('categories').select('*').order('name').then(must)
+      ]);
+      projects = p;
+      main.innerHTML = `
+        <div class="toolbar"><span class="muted">${p.length} project${p.length === 1 ? '' : 's'}</span><button class="btn primary" id="addP">+ Add project</button></div>
+        ${p.length ? `<div class="list">${p.map((x, i) => `
+          <div class="row" data-id="${x.id}">
+            <img class="t" src="${esc(safeUrl(x.image_url))}" alt="" loading="lazy">
+            <div class="grow"><b>${esc(x.title)}</b>
+              <small>${x.categories ? esc(x.categories.name) : 'No category'}</small><br>
+              <span class="badge ${x.is_published ? 'ok' : ''}">${x.is_published ? 'Published' : 'Unpublished'}</span>${x.is_featured ? '<span class="badge feat">★ Featured</span>' : ''}
+            </div>
+            <div class="actions">
+              <button class="btn sm" data-a="up" ${i === 0 ? 'disabled' : ''} aria-label="Move up">↑</button>
+              <button class="btn sm" data-a="down" ${i === p.length - 1 ? 'disabled' : ''} aria-label="Move down">↓</button>
+              <button class="btn sm" data-a="pub">${x.is_published ? 'Unpublish' : 'Publish'}</button>
+              <button class="btn sm" data-a="feat">${x.is_featured ? 'Unfeature' : 'Feature'}</button>
+              <button class="btn sm" data-a="edit">Edit</button>
+              <button class="btn sm danger" data-a="del">Delete</button>
+            </div>
+          </div>`).join('')}</div>` : '<div class="empty">No projects yet.</div>'}`;
+      $('#addP').onclick = () => projectForm(null, c);
+      $$('.row[data-id]', main).forEach((row) => {
+        const idx = p.findIndex((x) => x.id === row.dataset.id), item = p[idx];
+        row.addEventListener('click', (e) => {
+          const b = e.target.closest('[data-a]'); if (!b) return;
+          const a = b.dataset.a;
+          guard(b, async () => {
+            if (a === 'edit') return projectForm(item, c);
+            if (a === 'up' || a === 'down') { await move('projects', p, idx, a === 'up' ? -1 : 1); return portfolio(); }
+            if (a === 'pub') { must(await sb.from('projects').update({ is_published: !item.is_published }).eq('id', item.id).select('id'), true); toast(item.is_published ? 'Project unpublished.' : 'Project published — it is now live.'); return portfolio(); }
+            if (a === 'feat') { must(await sb.from('projects').update({ is_featured: !item.is_featured }).eq('id', item.id).select('id'), true); toast('Updated.'); return portfolio(); }
+            if (a === 'del') {
+              if (!(await confirmDialog(`Delete "${item.title}"? This also removes its image and cannot be undone.`))) return;
+              must(await sb.from('projects').delete().eq('id', item.id).select('id'), true);
+              await removeByUrl(item.image_url);
+              toast('Project deleted.'); return portfolio();
+            }
+          });
+        });
+      });
+    } catch (e) { errBox(e, portfolio); }
+  }
+
+  function projectForm(p, cats) {
+    const m = modal(p ? 'Edit project' : 'Add project', `
+      <form class="form" id="pf" novalidate>
+        <label>Title <input name="title" maxlength="160" required value="${esc(p ? p.title : '')}"></label>
+        <label>Description <textarea name="description" maxlength="2000">${esc(p ? p.description : '')}</textarea></label>
+        <label>Category <select name="category_id"><option value="">— None —</option>${cats.map((c) => `<option value="${c.id}" ${p && p.category_id === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></label>
+        <label>Thumbnail image ${p ? '(choose a file only to replace the current one)' : ''}
+          <input type="file" name="file" accept="image/jpeg,image/png,image/webp">
+        </label>
+        <img class="preview" id="pv" alt="Preview" ${p ? `src="${esc(safeUrl(p.image_url))}"` : 'hidden'}>
+        <div class="progress" hidden><i></i></div>
+        <span class="hint">JPEG, PNG or WebP. Best at 1280×720 (16:9). Images are optimized automatically.</span>
+        <label class="check"><input type="checkbox" name="is_published" ${p && p.is_published ? 'checked' : ''}> Published (visible on the website)</label>
+        <label class="check"><input type="checkbox" name="is_featured" ${p && p.is_featured ? 'checked' : ''}> Featured</label>
+        <div class="end"><button type="button" class="btn" id="cancel">Cancel</button><button class="btn primary" type="submit">${p ? 'Save changes' : 'Add project'}</button></div>
+      </form>`, true);
+    const f = $('#pf', m.el); imagePicker(m.el, '#pv', 'input[type=file]');
+    $('#cancel', m.el).onclick = m.close;
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      guard(e.submitter, async () => {
+        const fd = new FormData(f), title = (fd.get('title') || '').trim(), file = f.file.files[0];
+        if (!title) throw new Error('Title is required.');
+        if (!p && !file) throw new Error('Please choose a thumbnail image.');
+        let up = null;
+        e.submitter.textContent = 'Uploading…';
+        if (file) up = await uploadImage(file, 'projects', 1920, progressBar(m.el));
+        const row = { title, description: (fd.get('description') || '').trim(), category_id: fd.get('category_id') || null, is_published: !!fd.get('is_published'), is_featured: !!fd.get('is_featured') };
+        if (up) row.image_url = up.url;
+        try {
+          if (p) must(await sb.from('projects').update(row).eq('id', p.id).select('id'), true);
+          else {
+            const { data: first } = await sb.from('projects').select('display_order').order('display_order').limit(1);
+            row.display_order = first && first.length ? first[0].display_order - 1 : 0; // new projects go first
+            must(await sb.from('projects').insert(row).select('id'), true);
+          }
+        } catch (err) { if (up) await removeByUrl(up.url); throw err; }
+        if (up && p) await removeByUrl(p.image_url);
+        toast(p ? 'Project updated.' : 'Project added.'); m.close(); portfolio();
+      });
+    });
+  }
+
+  /* ---------------- CATEGORIES ---------------- */
+  async function categories() {
+    main.innerHTML = loading();
+    try {
+      const [c, pr] = await Promise.all([sb.from('categories').select('*').order('name').then(must), sb.from('projects').select('category_id').then(must)]);
+      const counts = {}; pr.forEach((x) => { if (x.category_id) counts[x.category_id] = (counts[x.category_id] || 0) + 1; });
+      main.innerHTML = `
+        <div class="panel"><form class="form" id="cf" style="grid-template-columns:1fr auto;align-items:end"><label>New category <input name="name" maxlength="60" placeholder="e.g. Fortnite" required></label><button class="btn primary">Add</button></form></div>
+        ${c.length ? `<div class="list">${c.map((x) => `<div class="row" data-id="${x.id}"><div class="grow"><b>${esc(x.name)}</b><small>${counts[x.id] || 0} project(s) · /${esc(x.slug)}</small></div><div class="actions"><button class="btn sm" data-a="edit">Rename</button><button class="btn sm danger" data-a="del">Delete</button></div></div>`).join('')}</div>` : '<div class="empty">No categories yet.</div>'}
+        <p class="hint" style="margin-top:14px">Assign a project to a category from Manage Portfolio → Edit.</p>`;
+      const save = async (id, name) => {
+        name = name.trim(); if (!name) throw new Error('Name is required.');
+        const row = { name, slug: slugify(name) };
+        const r = id ? await sb.from('categories').update(row).eq('id', id).select('id') : await sb.from('categories').insert(row).select('id');
+        if (r.error && r.error.code === '23505') throw new Error('A category with this name already exists.');
+        must(r, true);
+      };
+      $('#cf').addEventListener('submit', (e) => { e.preventDefault(); guard(e.submitter, async () => { await save(null, new FormData(e.target).get('name') || ''); toast('Category added.'); categories(); }); });
+      $$('.row[data-id]', main).forEach((row) => row.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-a]'); if (!b) return; const item = c.find((x) => x.id === row.dataset.id);
+        if (b.dataset.a === 'edit') {
+          const m = modal('Rename category', `<form class="form" id="rf"><label>Name <input name="name" maxlength="60" value="${esc(item.name)}" required></label><div class="end"><button type="button" class="btn" id="x">Cancel</button><button class="btn primary">Save</button></div></form>`);
+          $('#x', m.el).onclick = m.close;
+          $('#rf', m.el).addEventListener('submit', (ev) => { ev.preventDefault(); guard(ev.submitter, async () => { await save(item.id, new FormData(ev.target).get('name') || ''); toast('Category renamed.'); m.close(); categories(); }); });
+        } else guard(b, async () => {
+          if (!(await confirmDialog(`Delete category "${item.name}"? Its ${counts[item.id] || 0} project(s) will become uncategorized.`))) return;
+          must(await sb.from('categories').delete().eq('id', item.id).select('id'), true); toast('Category deleted.'); categories();
+        });
+      }));
+    } catch (e) { errBox(e, categories); }
+  }
+
+  /* ---------------- SERVICES ---------------- */
+  async function services() {
+    main.innerHTML = loading();
+    try {
+      const s = await sb.from('services').select('*').order('display_order').then(must);
+      main.innerHTML = `
+        <div class="toolbar"><span class="muted">${s.length} service${s.length === 1 ? '' : 's'}</span><button class="btn primary" id="addS">+ Add service</button></div>
+        ${s.length ? `<div class="list">${s.map((x, i) => `<div class="row" data-id="${x.id}"><div class="grow"><b>${esc(x.title)}</b><small>${esc(x.price || 'No price')}</small><br><span class="badge ${x.is_visible ? 'ok' : ''}">${x.is_visible ? 'Visible' : 'Hidden'}</span></div>
+          <div class="actions"><button class="btn sm" data-a="up" ${i === 0 ? 'disabled' : ''} aria-label="Move up">↑</button><button class="btn sm" data-a="down" ${i === s.length - 1 ? 'disabled' : ''} aria-label="Move down">↓</button><button class="btn sm" data-a="vis">${x.is_visible ? 'Hide' : 'Show'}</button><button class="btn sm" data-a="edit">Edit</button><button class="btn sm danger" data-a="del">Delete</button></div></div>`).join('')}</div>` : '<div class="empty">No services yet.</div>'}`;
+      $('#addS').onclick = () => serviceForm(null, s);
+      $$('.row[data-id]', main).forEach((row) => row.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-a]'); if (!b) return; const idx = s.findIndex((x) => x.id === row.dataset.id), item = s[idx], a = b.dataset.a;
+        guard(b, async () => {
+          if (a === 'edit') return serviceForm(item, s);
+          if (a === 'up' || a === 'down') { await move('services', s, idx, a === 'up' ? -1 : 1); return services(); }
+          if (a === 'vis') { must(await sb.from('services').update({ is_visible: !item.is_visible }).eq('id', item.id).select('id'), true); toast('Updated.'); return services(); }
+          if (a === 'del') { if (!(await confirmDialog(`Delete service "${item.title}"?`))) return; must(await sb.from('services').delete().eq('id', item.id).select('id'), true); toast('Service deleted.'); services(); }
+        });
+      }));
+    } catch (e) { errBox(e, services); }
+  }
+  function serviceForm(s, all) {
+    const m = modal(s ? 'Edit service' : 'Add service', `<form class="form" id="sf" novalidate>
+      <label>Title <input name="title" maxlength="120" required value="${esc(s ? s.title : '')}"></label>
+      <label>Description <textarea name="description" maxlength="1000">${esc(s ? s.description : '')}</textarea></label>
+      <label>Price (optional) <input name="price" maxlength="40" placeholder="e.g. From $15" value="${esc(s ? s.price || '' : '')}"></label>
+      <label class="check"><input type="checkbox" name="is_visible" ${!s || s.is_visible ? 'checked' : ''}> Visible on the website</label>
+      <div class="end"><button type="button" class="btn" id="x">Cancel</button><button class="btn primary">${s ? 'Save changes' : 'Add service'}</button></div></form>`);
+    $('#x', m.el).onclick = m.close;
+    $('#sf', m.el).addEventListener('submit', (e) => { e.preventDefault(); guard(e.submitter, async () => {
+      const fd = new FormData(e.target), title = (fd.get('title') || '').trim(); if (!title) throw new Error('Title is required.');
+      const row = { title, description: (fd.get('description') || '').trim(), price: (fd.get('price') || '').trim() || null, is_visible: !!fd.get('is_visible') };
+      if (s) must(await sb.from('services').update(row).eq('id', s.id).select('id'), true);
+      else { row.display_order = all.length ? Math.max(...all.map((x) => x.display_order)) + 1 : 0; must(await sb.from('services').insert(row).select('id'), true); }
+      toast(s ? 'Service updated.' : 'Service added.'); m.close(); services();
+    }); });
+  }
+
+  /* ---------------- ABOUT ---------------- */
+  async function about() {
+    main.innerHTML = loading();
+    try {
+      const a = (await sb.from('about').select('*').limit(1).maybeSingle().then(must)) || {};
+      const sl = a.social_links || {};
+      main.innerHTML = `<form class="panel form" id="af" novalidate>
+        <label>Name / brand <input name="name" maxlength="120" value="${esc(a.name || '')}"></label>
+        <label>Profile image <input type="file" name="file" accept="image/jpeg,image/png,image/webp"></label>
+        <img class="preview sq" id="pv" alt="Profile preview" ${a.profile_image ? `src="${esc(safeUrl(a.profile_image))}"` : 'hidden'}>
+        <div class="progress" hidden><i></i></div>
+        <label>Professional description (short) <textarea name="professional_description" maxlength="500">${esc(a.professional_description || '')}</textarea></label>
+        <label>Biography <textarea name="biography" rows="5" maxlength="4000">${esc(a.biography || '')}</textarea></label>
+        <label>Experience <textarea name="experience" maxlength="3000">${esc(a.experience || '')}</textarea></label>
+        <label>Design approach <textarea name="design_approach" maxlength="3000">${esc(a.design_approach || '')}</textarea></label>
+        <h2 style="font-size:1rem">Social links</h2>
+        <div class="two form">${Object.entries(SOCIALS).map(([k, l]) => `<label>${l} <input name="s_${k}" type="url" placeholder="https://…" value="${esc(sl[k] || '')}"></label>`).join('')}</div>
+        <div class="end"><button class="btn primary">Save</button></div></form>`;
+      const f = $('#af'); imagePicker(main, '#pv', 'input[type=file]');
+      f.addEventListener('submit', (e) => { e.preventDefault(); guard(e.submitter, async () => {
+        const fd = new FormData(f), file = f.file.files[0]; let up = null;
+        if (file) up = await uploadImage(file, 'profile', 900, progressBar(main));
+        const social = {}; for (const k of Object.keys(SOCIALS)) { const v = (fd.get('s_' + k) || '').trim(); if (v) { if (!safeUrl(v)) throw new Error(`${SOCIALS[k]} link must start with http(s)://`); social[k] = v; } }
+        const row = { name: (fd.get('name') || '').trim(), professional_description: fd.get('professional_description') || '', biography: fd.get('biography') || '', experience: fd.get('experience') || '', design_approach: fd.get('design_approach') || '', social_links: social };
+        if (up) row.profile_image = up.url;
+        try { must(a.id ? await sb.from('about').update(row).eq('id', a.id).select('id') : await sb.from('about').insert(row).select('id'), true); }
+        catch (err) { if (up) await removeByUrl(up.url); throw err; }
+        if (up && a.profile_image) await removeByUrl(a.profile_image);
+        toast('About page saved.'); about();
+      }); });
+    } catch (e) { errBox(e, about); }
+  }
+
+  /* ---------------- MESSAGES ---------------- */
+  async function updateUnread() {
+    const { count } = await sb.from('messages').select('id', { count: 'exact', head: true }).eq('is_read', false);
+    const p = $('#unread'); p.textContent = count || ''; p.hidden = !count;
+  }
+  async function messages() {
+    main.innerHTML = loading();
+    try {
+      const m = await sb.from('messages').select('*').order('created_at', { ascending: false }).then(must);
+      main.innerHTML = m.length ? `<div class="list">${m.map((x) => `<details class="msg-item ${x.is_read ? '' : 'unread'}" data-id="${x.id}">
+        <summary><span><b>${esc(x.name)}</b> <span class="muted">· ${esc(x.email)}</span></span><span class="muted">${fmtDate(x.created_at)}</span></summary>
+        <p>${esc(x.message)}</p>
+        <div class="actions" style="justify-content:flex-start"><a class="btn sm" href="mailto:${esc(x.email)}">Reply by email</a><button class="btn sm" data-a="read">${x.is_read ? 'Mark unread' : 'Mark read'}</button><button class="btn sm danger" data-a="del">Delete</button></div></details>`).join('')}</div>` : '<div class="empty">No messages yet.</div>';
+      $$('details.msg-item', main).forEach((d) => {
+        const item = m.find((x) => x.id === d.dataset.id);
+        d.addEventListener('toggle', async () => { if (d.open && !item.is_read) { try { must(await sb.from('messages').update({ is_read: true }).eq('id', item.id).select('id'), true); item.is_read = true; d.classList.remove('unread'); $('[data-a=read]', d).textContent = 'Mark unread'; updateUnread(); } catch (e) { toast(errMsg(e), 'error'); } } });
+        d.addEventListener('click', (e) => { const b = e.target.closest('button[data-a]'); if (!b) return; guard(b, async () => {
+          if (b.dataset.a === 'read') { must(await sb.from('messages').update({ is_read: !item.is_read }).eq('id', item.id).select('id'), true); }
+          else { if (!(await confirmDialog('Delete this message permanently?'))) return; must(await sb.from('messages').delete().eq('id', item.id).select('id'), true); toast('Message deleted.'); }
+          updateUnread(); messages();
+        }); });
+      });
+    } catch (e) { errBox(e, messages); }
+  }
+
+  /* ---------------- SETTINGS ---------------- */
+  async function settings() {
+    main.innerHTML = loading();
+    try {
+      const rows = await sb.from('website_settings').select('setting_key,setting_value').then(must);
+      const s = {}; rows.forEach((r) => { s[r.setting_key] = r.setting_value; });
+      const sl = s.social_links || {};
+      main.innerHTML = `<form class="panel form" id="sf" novalidate>
+        <div class="two"><label>Website title <input name="site_title" maxlength="80" value="${esc(s.site_title || '')}"></label>
+        <label>Accent color <input type="color" name="accent_color" value="${/^#[0-9a-f]{6}$/i.test(s.accent_color || '') ? s.accent_color : '#7c5cff'}"></label></div>
+        <label>SEO description <textarea name="meta_description" maxlength="300">${esc(s.meta_description || '')}</textarea></label>
+        <label>Logo <input type="file" name="logo" accept="image/jpeg,image/png,image/webp"></label>
+        <img class="preview sq" id="pvLogo" alt="Logo" ${s.logo_url ? `src="${esc(safeUrl(s.logo_url))}"` : 'hidden'}>
+        <h2 style="font-size:1rem">Hero</h2>
+        <label>Headline <input name="hero_headline" maxlength="150" value="${esc(s.hero_headline || '')}"></label>
+        <label>Description <textarea name="hero_description" maxlength="600">${esc(s.hero_description || '')}</textarea></label>
+        <label>Hero image / avatar <input type="file" name="hero" accept="image/jpeg,image/png,image/webp"></label>
+        <img class="preview sq" id="pvHero" alt="Hero" ${s.hero_image ? `src="${esc(safeUrl(s.hero_image))}"` : 'hidden'}>
+        <div class="progress" hidden><i></i></div>
+        <h2 style="font-size:1rem">Contact</h2>
+        <div class="two"><label>WhatsApp number (country code + number, digits only) <input name="whatsapp_number" inputmode="numeric" placeholder="14155552671" value="${esc(s.whatsapp_number || '')}"></label>
+        <label>Email (optional) <input name="email" type="email" value="${esc(s.email || '')}"></label></div>
+        <div class="two">${Object.entries(SOCIALS).map(([k, l]) => `<label>${l} <input name="s_${k}" type="url" placeholder="https://…" value="${esc(sl[k] || '')}"></label>`).join('')}</div>
+        <label>Footer text <input name="footer_text" maxlength="200" value="${esc(s.footer_text || '')}"></label>
+        <div class="end"><button class="btn primary">Save settings</button></div></form>
+        <div class="panel" id="mfa"></div>`;
+      const f = $('#sf'); imagePicker(main, '#pvLogo', 'input[name=logo]'); imagePicker(main, '#pvHero', 'input[name=hero]');
+      f.addEventListener('submit', (e) => { e.preventDefault(); guard(e.submitter, async () => {
+        const fd = new FormData(f); const ups = [];
+        const prog = progressBar(main);
+        const wa = String(fd.get('whatsapp_number') || '').replace(/\D/g, '');
+        if (wa && (wa.length < 7 || wa.length > 15)) throw new Error('WhatsApp number must be 7–15 digits including the country code.');
+        const social = {}; for (const k of Object.keys(SOCIALS)) { const v = (fd.get('s_' + k) || '').trim(); if (v) { if (!safeUrl(v)) throw new Error(`${SOCIALS[k]} link must start with http(s)://`); social[k] = v; } }
+        const out = { site_title: fd.get('site_title') || '', meta_description: fd.get('meta_description') || '', accent_color: fd.get('accent_color'), hero_headline: fd.get('hero_headline') || '', hero_description: fd.get('hero_description') || '', whatsapp_number: wa, email: (fd.get('email') || '').trim(), footer_text: fd.get('footer_text') || '', social_links: social, logo_url: s.logo_url || '', hero_image: s.hero_image || '' };
+        const old = [];
+        try {
+          if (f.logo.files[0]) { const u = await uploadImage(f.logo.files[0], 'branding', 512, prog); ups.push(u.url); old.push(s.logo_url); out.logo_url = u.url; }
+          if (f.hero.files[0]) { const u = await uploadImage(f.hero.files[0], 'branding', 1000, prog); ups.push(u.url); old.push(s.hero_image); out.hero_image = u.url; }
+          must(await sb.from('website_settings').upsert(Object.entries(out).map(([setting_key, setting_value]) => ({ setting_key, setting_value })), { onConflict: 'setting_key' }).select('id'), true);
+        } catch (err) { await Promise.all(ups.map(removeByUrl)); throw err; }
+        await Promise.all(old.map(removeByUrl));
+        toast('Settings saved — the website is updated.'); settings();
+      }); });
+      mfaCard();
+    } catch (e) { errBox(e, settings); }
+  }
+
+  async function mfaCard() {
+    const box = $('#mfa'); if (!box) return;
+    const { data, error } = await sb.auth.mfa.listFactors();
+    if (error) { box.innerHTML = `<h2>Two-factor authentication</h2><p class="muted">Not available: ${esc(errMsg(error))}</p>`; return; }
+    const verified = (data.totp || []).filter((x) => x.status === 'verified');
+    if (verified.length) {
+      box.innerHTML = `<h2>Two-factor authentication</h2><p>✅ Enabled (authenticator app).</p><div style="margin-top:12px"><button class="btn danger sm" id="mfaOff">Disable</button></div>`;
+      $('#mfaOff').onclick = (e) => guard(e.target, async () => {
+        if (!(await confirmDialog('Disable two-factor authentication?', 'Disable'))) return;
+        const { error: er } = await sb.auth.mfa.unenroll({ factorId: verified[0].id }); if (er) throw er; toast('2FA disabled.'); mfaCard();
+      });
+      return;
+    }
+    box.innerHTML = `<h2>Two-factor authentication</h2><p class="muted">Protect your account with an authenticator app (Google Authenticator, Authy, 1Password…).</p><div style="margin-top:12px"><button class="btn primary sm" id="mfaOn">Enable 2FA</button></div><div id="mfaStep"></div>`;
+    $('#mfaOn').onclick = (e) => guard(e.target, async () => {
+      for (const f of (data.totp || []).filter((x) => x.status !== 'verified')) await sb.auth.mfa.unenroll({ factorId: f.id });
+      const { data: en, error: er } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Authenticator ' + Date.now() }); if (er) throw er;
+      $('#mfaStep').innerHTML = `<div class="form" style="margin-top:16px"><p>Scan this QR code, then enter the 6-digit code.</p><img src="${esc(en.totp.qr_code)}" alt="2FA QR code" width="180" height="180" style="background:#fff;padding:8px;border-radius:10px"><p class="hint">Or enter this key manually: <code>${esc(en.totp.secret)}</code></p><label>Code <input id="mfaCode" inputmode="numeric" maxlength="6"></label><div><button class="btn primary sm" id="mfaVerify">Verify &amp; enable</button></div></div>`;
+      $('#mfaVerify').onclick = (ev) => guard(ev.target, async () => {
+        const { error: ve } = await sb.auth.mfa.challengeAndVerify({ factorId: en.id, code: $('#mfaCode').value.trim() }); if (ve) throw ve; toast('2FA enabled.'); mfaCard();
+      });
+    });
+  }
+
+  /* ---------------- router + boot ---------------- */
+  const routes = { overview, portfolio, categories, services, about, messages, settings };
+  function route() {
+    const k = (location.hash || '#overview').slice(1); const r = routes[k] ? k : 'overview';
+    $$('#sideNav a').forEach((a) => a.classList.toggle('active', a.dataset.s === r));
+    $('#pageTitle').textContent = TITLES[r]; document.title = TITLES[r] + ' — Admin';
+    $('#sidebar').classList.remove('open'); $('#scrim').hidden = true;
+    routes[r]();
+  }
+
+  async function signOut() { try { await sb.auth.signOut(); } finally { location.replace(LOGIN_URL); } }
+
+  async function boot() {
+    const gate = $('#gate');
+    const deny = (html) => { gate.innerHTML = html; };
+    if (!sb) return deny('<p>Supabase library failed to load. Check your connection.</p>');
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return location.replace(LOGIN_URL);
+      const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (aal && aal.nextLevel === 'aal2' && aal.currentLevel !== 'aal2') return location.replace(LOGIN_URL);
+      const { data: ok, error } = await sb.rpc('is_admin');
+      if (error) throw error;
+      if (ok !== true) {
+        deny('<h2>Access denied</h2><p class="muted">This account is not authorized to administer the site.</p><button class="btn" id="out">Sign out</button>');
+        $('#out').onclick = signOut; return;
+      }
+    } catch (e) {
+      deny(`<h2>Cannot verify access</h2><p class="muted">${esc(errMsg(e))}</p><button class="btn" onclick="location.reload()">Retry</button>`); return;
+    }
+    gate.hidden = true; $('#app').hidden = false;
+    sb.auth.onAuthStateChange((ev) => { if (ev === 'SIGNED_OUT') location.replace(LOGIN_URL); });
+    $('#logout').onclick = signOut;
+    $('#menuBtn').onclick = () => { $('#sidebar').classList.add('open'); $('#scrim').hidden = false; };
+    $('#scrim').onclick = () => { $('#sidebar').classList.remove('open'); $('#scrim').hidden = true; };
+    window.addEventListener('hashchange', route);
+    // auto-logout after 30 min of inactivity
+    let idle; const reset = () => { clearTimeout(idle); idle = setTimeout(signOut, 30 * 60 * 1000); };
+    ['click', 'keydown', 'touchstart', 'mousemove'].forEach((ev) => document.addEventListener(ev, reset, { passive: true })); reset();
+    updateUnread(); route();
+  }
+  boot();
+})();
+
+</script>
+</body>
+</html>
